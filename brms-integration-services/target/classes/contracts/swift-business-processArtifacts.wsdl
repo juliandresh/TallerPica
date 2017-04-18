@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<definitions name="swift-business-process"
+        targetNamespace="http://swift.business.process"
+        xmlns:tns="http://swift.business.process"
+        xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
+        xmlns="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+        >
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     TYPE DEFINITION - List of services participating in this BPEL process 
+     The default output of the BPEL designer uses strings as input and 
+     output to the BPEL Process. But you can define or import any XML 
+     Schema type and us them as part of the message types.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->    
+    <types>  
+        <schema attributeFormDefault="unqualified" 
+                elementFormDefault="qualified" 
+                targetNamespace="http://swift.business.process" 
+                xmlns="http://www.w3.org/2001/XMLSchema"
+                >
+                
+            <element name="swift-business-processRequest">
+                <complexType>
+                    <sequence>
+                        <element name="input" type="tns:aircraftIngateEvent" />
+                    </sequence>
+                </complexType>
+            </element>
+                  
+            <element name="swift-business-processResponse">
+                <complexType>
+                    <sequence>
+                        <element name="transactionCode" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            
+            <complexType name="IncidentsReport">
+            	<sequence>
+            		<element name="description" type="string"></element>
+            		<element name="summary" type="string"></element>
+            		<element name="category" type="int"></element>
+            	</sequence>
+            </complexType>
+        
+            <complexType name="Maintenance">
+            	<sequence>
+            		<element name="fuelPercentage" type="int"></element>
+            		<element name="undercarriageStatus" type="string"></element>
+            	</sequence>
+            </complexType>
+        
+            <complexType name="CrewPlaningChanges">
+            	<sequence>
+            		<element name="applyChangesOnCrewMembers"
+            			type="boolean">
+            		</element>
+            		<element name="totalCrewMemberRequired"
+            			type="int">
+            		</element>
+            		<element name="changePilot" type="string"></element>
+            	</sequence>
+            </complexType>
+        
+            <complexType name="aircraftIngateEvent">
+            	<sequence>
+            		<element name="eventDate" type="date"></element>
+            		<element name="incidentsReport"
+            			type="tns:IncidentsReport">
+            		</element>
+            		<element name="maintenance"
+            			type="tns:Maintenance">
+            		</element>
+            		<element name="crewPlaningChanges" type="tns:CrewPlaningChanges"></element>
+            	</sequence>
+            </complexType>
+            
+        </schema>
+    </types>
+  
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     MESSAGE TYPE DEFINITION - Definition of the message types used as 
+     part of the port type defintions
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->    
+    <message name="swift-business-processRequestMessage">
+        <part name="payload" element="tns:swift-business-processRequest"/>
+    </message>
+    
+    <message name="swift-business-processResponseMessage">
+        <part name="payload" element="tns:swift-business-processResponse"/>
+    </message>
+
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     PORT TYPE DEFINITION - A port type groups a set of operations into
+     a logical service unit.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- portType implemented by the swift-business-process BPEL process -->
+    <portType name="swift-business-process">
+        <operation name="process">
+            <input message="tns:swift-business-processRequestMessage"/>
+            <output message="tns:swift-business-processResponseMessage"/>
+        </operation>
+    </portType>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     PARTNER LINK TYPE DEFINITION
+         the swift-business-process partnerLinkType binds the provider and
+         requester portType into an asynchronous conversation.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->    
+    <plnk:partnerLinkType name="swift-business-process">
+        <plnk:role name="swift-business-processProvider" portType="tns:swift-business-process"/>        
+    </plnk:partnerLinkType>   
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     BINDING DEFINITION - Defines the message format and protocol details
+     for a web service.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <binding name="swift-business-processBinding" type="tns:swift-business-process">
+        <soap:binding style="document"
+    		transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="process">
+            <soap:operation
+    			soapAction="http://swift.business.process/process"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+				<soap:body use="literal" />
+			</output>
+        </operation>
+    </binding>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     SERVICE DEFINITION - A service groups a set of ports into
+     a service unit.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <service name="swift-business-process">
+        <port name="swift-business-processPort" binding="tns:swift-business-processBinding">
+    		<soap:address location="http://localhost:8080/swift-business-process"/>
+        </port>
+    </service>
+</definitions>

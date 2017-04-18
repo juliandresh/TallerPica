@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://mtx.enterprise/services/filter"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
+	xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="FilterServiceService"
+	targetNamespace="http://mtx.enterprise/services/filter">
+	<wsdl:types>
+		<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			xmlns:tns="http://mtx.enterprise/services/filter" elementFormDefault="unqualified"
+			targetNamespace="http://mtx.enterprise/services/filter" version="1.0">
+
+			<xs:element name="evaluateAircraft" type="tns:evaluateAircraft" />
+
+			<xs:element name="evaluateAircraftResponse" type="tns:evaluateAircraftResponse" />
+
+			<xs:element name="mroFilterRequest" type="tns:mroFilterRequest" />
+
+			<xs:element name="mroFilterResponse" type="tns:mroFilterResponse" />
+
+			<xs:complexType name="evaluateAircraft">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="request" type="tns:mroFilterRequest" />
+				</xs:sequence>
+			</xs:complexType>
+
+			<xs:complexType name="mroFilterRequest">
+				<xs:sequence>
+					<xs:element name="aicraftModel" type="xs:int" />
+					<xs:element minOccurs="0" name="aircraftType" type="xs:string" />
+				</xs:sequence>
+			</xs:complexType>
+
+			<xs:complexType name="evaluateAircraftResponse">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="return" type="tns:mroFilterResponse" />
+				</xs:sequence>
+			</xs:complexType>
+
+			<xs:complexType name="mroFilterResponse">
+				<xs:sequence>
+					<xs:element name="isValidAircraft" type="xs:boolean" />
+				</xs:sequence>
+			</xs:complexType>
+
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:message name="evaluateAircraftResponse">
+		<wsdl:part element="tns:evaluateAircraftResponse" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="evaluateAircraft">
+		<wsdl:part element="tns:evaluateAircraft" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	
+	<plnk:partnerLinkType name="filterPortType_PLT">
+		<plnk:role name="filterPortType_Role" portType="tns:FilterService" />
+	</plnk:partnerLinkType>
+	
+	<wsdl:portType name="FilterService">
+		<wsdl:operation name="evaluateAircraft">
+			<wsdl:input message="tns:evaluateAircraft" name="evaluateAircraft">
+			</wsdl:input>
+			<wsdl:output message="tns:evaluateAircraftResponse" name="evaluateAircraftResponse">
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="FilterServiceServiceSoapBinding" type="tns:FilterService">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="evaluateAircraft">
+			<soap:operation soapAction="evaluateAircraft" style="document" />
+			<wsdl:input name="evaluateAircraft">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="evaluateAircraftResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="FilterServiceService">
+		<wsdl:port binding="tns:FilterServiceServiceSoapBinding"
+			name="FilterServicePort">
+			<soap:address
+				location="http://localhost:9696/mtx-filter-service/FilterService" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

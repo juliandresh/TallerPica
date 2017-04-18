@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<definitions name="aircraft-bpel"
+        targetNamespace="www.aircraft-bpel.com"
+        xmlns:tns="www.aircraft-bpel.com"
+        xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
+        xmlns="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+        >
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     TYPE DEFINITION - List of services participating in this BPEL process 
+     The default output of the BPEL designer uses strings as input and 
+     output to the BPEL Process. But you can define or import any XML 
+     Schema type and us them as part of the message types.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->    
+    <types>  
+        <schema attributeFormDefault="unqualified" 
+                elementFormDefault="qualified" 
+                targetNamespace="www.aircraft-bpel.com" 
+                xmlns="http://www.w3.org/2001/XMLSchema"
+                >
+                
+            <element name="aircraft-bpelRequest">
+                <complexType>
+                    <sequence>
+                        <element name="input" type="tns:aircraftIngateEvent" />
+                    </sequence>
+                </complexType>
+            </element>
+                  
+            <element name="aircraft-bpelResponse">
+                <complexType>
+                    <sequence>
+                        <element name="result" type="tns:aircraftIngateEvent"/>
+                    </sequence>
+                </complexType>
+            </element>
+            
+        
+            <complexType name="IncidentsReport">
+            	<sequence>
+            		<element name="description" type="string"></element>
+            		<element name="summary" type="string"></element>
+            		<element name="category" type="int"></element>
+            	</sequence>
+            </complexType>
+        
+            <complexType name="Maintenance">
+            	<sequence>
+            		<element name="fuelPercentage" type="int"></element>
+            		<element name="undercarriageStatus" type="string"></element>
+            	</sequence>
+            </complexType>
+        
+            <complexType name="CrewPlaningChanges">
+            	<sequence>
+            		<element name="applyChangesOnCrewMembers"
+            			type="boolean">
+            		</element>
+            		<element name="totalCrewMemberRequired"
+            			type="int">
+            		</element>
+            		<element name="changePilot" type="string"></element>
+            	</sequence>
+            </complexType>
+        
+            <complexType name="aircraftIngateEvent">
+            	<sequence>
+            		<element name="eventDate" type="date"></element>
+            		<element name="incidentsReport"
+            			type="tns:IncidentsReport">
+            		</element>
+            		<element name="maintenance"
+            			type="tns:Maintenance">
+            		</element>
+            		<element name="crewPlaningChanges" type="tns:CrewPlaningChanges"></element>
+            	</sequence>
+            </complexType>
+        </schema>
+    </types>
+  
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     MESSAGE TYPE DEFINITION - Definition of the message types used as 
+     part of the port type defintions
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->    
+    <message name="aircraft-bpelRequestMessage">
+        <part name="payload" element="tns:aircraft-bpelRequest"/>
+    </message>
+    
+    <message name="aircraft-bpelResponseMessage">
+        <part name="payload" element="tns:aircraft-bpelResponse"/>
+    </message>
+
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     PORT TYPE DEFINITION - A port type groups a set of operations into
+     a logical service unit.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- portType implemented by the aircraft-bpel BPEL process -->
+    <portType name="aircraft-bpel">
+        <operation name="initiate">
+            <input message="tns:aircraft-bpelRequestMessage"/>
+        </operation>
+    </portType>
+
+    <!-- portType implemented by the requester of aircraft-bpel BPEL process 
+         for asynchronous callback purposes
+         -->
+    <portType name="aircraft-bpelCallback">
+        <operation name="onResult">
+            <input message="tns:aircraft-bpelResponseMessage"/>
+        </operation>
+    </portType>
+
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     PARTNER LINK TYPE DEFINITION
+         the aircraft-bpel partnerLinkType binds the provider and
+         requester portType into an asynchronous conversation.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->    
+    <plnk:partnerLinkType name="aircraft-bpel">
+        <plnk:role name="aircraft-bpelProvider" portType="tns:aircraft-bpel"/>
+        <plnk:role name="aircraft-bpelRequester" portType="tns:aircraft-bpelCallback"/>
+    </plnk:partnerLinkType>   
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     BINDING DEFINITION - Defines the message format and protocol details
+     for a web service.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <binding name="aircraft-bpelBinding" type="tns:aircraft-bpel">
+        <soap:binding style="document"
+    		transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="initiate">
+            <soap:operation
+    			soapAction="www.aircraft-bpel.com/initiate"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+        </operation>
+    </binding>
+
+    <binding name="aircraft-bpelCallbackBinding" type="tns:aircraft-bpelCallback">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="onResult">
+            <soap:operation
+    			soapAction="www.aircraft-bpel.com/onResult"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+        </operation>
+    </binding>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     SERVICE DEFINITION - A service groups a set of ports into
+     a service unit.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <service name="aircraft-bpelService">
+        <port name="aircraft-bpelPort" binding="tns:aircraft-bpelBinding">
+    		<soap:address location="http://localhost:8080/aircraft-bpel"/>
+        </port>
+    </service>
+
+    <service name="aircraft-bpelServiceCallback">
+        <port name="aircraft-bpelPortCallbackPort" binding="tns:aircraft-bpelCallbackBinding">
+    		<soap:address location="http://localhost:8080/aircraft-bpelCallback"/>
+        </port>
+    </service>
+</definitions>

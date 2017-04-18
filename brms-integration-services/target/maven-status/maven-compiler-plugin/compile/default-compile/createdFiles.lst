@@ -1,0 +1,4 @@
+co\com\foundation\javeriana\processor\BpelAdapter.class
+co\com\foundation\javeriana\model\IncidentsReport.class
+co\com\foundation\javeriana\model\CrewPlaningChanges.class
+co\com\foundation\javeriana\processor\RemoteRuleAdapter.class

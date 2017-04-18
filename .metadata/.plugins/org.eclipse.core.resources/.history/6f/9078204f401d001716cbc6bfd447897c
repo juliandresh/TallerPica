@@ -1,0 +1,35 @@
+package co.com.foundation.mtx.filter.unmarshaller.impl;
+
+import java.io.File;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+
+import co.com.foundation.mtx.filter.operations.info.DataSet;
+import co.com.foundation.mtx.filter.unmarshaller.Unmarshaller;
+
+
+public class JAXBUnmarshaller implements Unmarshaller<File, DataSet>
+{
+	public static JAXBContext newInstance(){
+		try 
+		{
+			return JAXBContext.newInstance(DataSet.class);
+		} 
+		catch (JAXBException e) {
+			return null;
+		}
+	}
+	
+	@Override
+	public DataSet unmarshall(File file) {
+		try {
+			JAXBContext jaxbContext = JAXBContext.newInstance(DataSet.class);
+			javax.xml.bind.Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+			return (DataSet) jaxbUnmarshaller.unmarshal(file);
+		} 
+		catch (JAXBException e) {
+			return null;
+		}		
+	}
+}

@@ -1,0 +1,8 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:proc="http://aerolineas-latinoamericana.com/soa/processes/crew-message/process-crew-message/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <proc:incidentsReportResponse>
+          <result>ok</result>
+      </proc:incidentsReportResponse>
+   </soapenv:Body>
+</soapenv:Envelope>

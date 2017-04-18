@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="property-value" type="xsd:string"/>
+  <xsd:element name="operational-captures">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element maxOccurs="unbounded" ref="pair-record"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="scheduled-captures">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element maxOccurs="unbounded" ref="pair-record"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="aircraft-information">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element maxOccurs="unbounded" ref="data-set"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="common-captures">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element maxOccurs="unbounded" ref="pair-record"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="pair-record">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="property-type"/>
+        <xsd:element ref="property-value"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="data-set">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="common-captures"/>
+        <xsd:element ref="operational-captures"/>
+        <xsd:element ref="scheduled-captures"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="property-type" type="xsd:string"/>
+</xsd:schema>

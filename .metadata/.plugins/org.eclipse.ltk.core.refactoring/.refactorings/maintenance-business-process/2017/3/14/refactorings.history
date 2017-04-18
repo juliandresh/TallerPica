@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Move &apos;aircraft-soap-api.wsdl&apos; to &apos;bpelContent&apos;" description="Move &apos;aircraft-soap-api.wsdl&apos; to &apos;bpelContent&apos;" destination="bpelContent" element1="bpelContent/providers/aircraft-soap-api.wsdl" flags="7" id="org.eclipse.ltk.core.refactoring.move.resources" resources="1" stamp="1490643677285" updateReferences="true"/>
+</session>

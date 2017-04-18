@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="reporting-pu" transaction-type="JTA">
+  	<provider>org.hibernate.ejb.HibernatePersistence</provider>
+  	<jta-data-source>java:jboss/datasources/maintenanceDS</jta-data-source>     
+    <class>co.com.foundation.mtx.reporting.model.MaintenanceNote</class>
+    <class>co.com.foundation.mtx.reporting.model.Operator</class>
+    <class>co.com.foundation.mtx.reporting.model.MaintenanceExecution</class>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+    <properties>
+        <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect"/>
+        <property name="hibernate.show_sql" value="false"/>
+      	<property name="hibernate.format_sql" value="false"/>
+        <property name="hibernate.transaction.flush_before_completion" value="true"/>
+   <!-- <property name="hibernate.connection.url" value="jdbc:oracle:thin:@localhost:1521:xe"/>
+      <property name="hibernate.connection.username" value="MAINTENANCE"/>
+      <property name="hibernate.connection.password" value="qwerty"/>
+      <property name="hibernate.connection.driver_class" value="oracle.jdbc.OracleDriver"/>
+   -->   
+      <!--  <property name="hibernate.cache.use_query_cache" value="false"/>-->     
+    </properties>
+  </persistence-unit>
+</persistence>

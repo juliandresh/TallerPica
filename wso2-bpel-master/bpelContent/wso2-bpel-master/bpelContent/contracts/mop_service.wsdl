@@ -1,0 +1,66 @@
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:tns="http://aerolineas-latinoamericana.com/soa/mop-message/mop-rule/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="mop"
+	xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
+	targetNamespace="http://aerolineas-latinoamericana.com/soa/mop-message/mop-rule/">
+	<wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+			xmlns:tns="http://aerolineas-latinoamericana.com/soa/mop-message/mop-rule/"
+			xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+			targetNamespace="http://aerolineas-latinoamericana.com/soa/mop-message/mop-rule/">
+			<xsd:element name="mopEvent">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="undercarriageStatus" type="xsd:string" />
+						<xsd:element name="fuelPercentage" type="xsd:int" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="mopEventResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="response" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="mopEventResponse">
+		<wsdl:part element="tns:mopEventResponse" name="parameters"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="mopEventRequest">
+		<wsdl:part element="tns:mopEvent" name="parameters"></wsdl:part>
+	</wsdl:message>
+	<wsdl:portType name="mop">
+		<wsdl:operation name="mopEvent">
+			<wsdl:input message="tns:mopEventRequest"></wsdl:input>
+			<wsdl:output message="tns:mopEventResponse"></wsdl:output>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="mopSOAP" type="tns:mop">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="mopEvent">
+			<soap:operation
+				soapAction="http://aerolineas-latinoamericana.com/soa/mop-message/mop-rule/mopEvent" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	
+	<plnk:partnerLinkType name="mopPortType_PLT">
+		<plnk:role name="mopPortType_Role" portType="tns:mop" />
+	</plnk:partnerLinkType>
+	
+	<wsdl:service name="mop">
+		<wsdl:port binding="tns:mopSOAP" name="mopSOAP">
+			<soap:address location="http://localhost:28084/esb/mop" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03"
+	xmlns:bpel="www.aircraft-bpel.com/"
+	xmlns:tns="http://aerolineas-latinoamericana.com/soa/mop-message/mop-rule/"
+	xmlns:cre="http://aerolineas-latinoamericana.com/soa/processes/crew-message/process-crew-message/"
+	xmlns:br="http://aerolineas-latinoamericana.com/soa/business-rule-message/process-business-rule/"
+	xmlns:inc="http://aerolineas-latinoamericana.com/soa/incidents-message/process-incidents-message/"
+	xmlns:tns2="http://eclipse.org/bpel/sample" xmlns:www.aircraft-bpel.com="www.aircraft-bpel.com">
+	<process name="www.aircraft-bpel.com:aircraft-bpel">
+		<process-events generate="all" />
+		<provide partnerLink="client">
+			<service name="www.aircraft-bpel.com:aircraft-bpelService"
+				port="aircraft-bpelPort" />
+		</provide>
+		<invoke partnerLink="client">
+			<service name="www.aircraft-bpel.com:aircraft-bpelServiceCallback"
+				port="aircraft-bpelPortCallbackPort" />
+		</invoke>
+		<invoke partnerLink="businessRulePartnerLink">
+			<service name="br:processBusinessRule" port="businessRuleSOAP" />
+		</invoke>
+		<invoke partnerLink="mopPartnerLink">
+			<service name="tns:mop" port="mopSOAP" />
+		</invoke>
+		<invoke partnerLink="crewPartnerLink">
+			<service name="cre:CrewService" port="CrewPortType" />
+		</invoke>
+		<invoke partnerLink="incidentsPartnerLink">
+			<service name="inc:incidentService" port="incidentPort" />
+		</invoke>
+	</process>
+</deploy>

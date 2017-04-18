@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:cxf="http://camel.apache.org/schema/cxf"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans 
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/cxf 
+       http://camel.apache.org/schema/cxf/camel-cxf.xsd
+       http://camel.apache.org/schema/spring 
+       http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL" value="tcp://localhost:61616" />
+		<property name="userName" value="admin" />
+		<property name="password" value="admin" />
+	</bean>
+
+	<bean id="pooledConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory"
+		init-method="start" destroy-method="stop">
+		<property name="maxConnections" value="8" />
+		<property name="connectionFactory" ref="jmsConnectionFactory" />
+	</bean>
+
+	<bean id="jmsConfig" class="org.apache.camel.component.jms.JmsConfiguration">
+		<property name="connectionFactory" ref="pooledConnectionFactory" />
+		<property name="concurrentConsumers" value="10" />
+	</bean>
+
+	<bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+		<property name="configuration" ref="jmsConfig" />
+	</bean>
+	
+	<!-- Aircraft-soap adapted service -->
+	<cxf:cxfEndpoint id="aircraft-ws"
+		address="http://localhost:28080/esb/aircraft" wsdlURL="contracts/aircraft-soap-api.wsdl"
+		endpointName="aircraft-soap-api-port" serviceName="s:aircraft-soap-api-service"
+		xmlns:s="http://aerolineas-latinoamericana.com/soa/processes/aircraft-artifacts"/>
+
+	<!-- BRMS adapted service -->
+	<cxf:cxfEndpoint id="brmsWS"
+		address="http://localhost:28080/esb/brms-services/maintenance" wsdlURL="contracts/business_rule.wsdl"
+		endpointName="s:businessRulePort" serviceName="s:businessRuleService"
+		xmlns:s="http://javeriana-maintenance/brms"/>
+		
+	<!-- CREW Service -->
+    <cxf:cxfEndpoint id="crew-ws" 
+		address="http://localhost:28080/esb/crew" wsdlURL="contracts/crew-service.wsdl"
+		endpointName="s:CrewPortType" serviceName="s:CrewService"
+		xmlns:s="http://aerolineas-latinoamericana.com/soa/processes/crew-message/process-crew-message/"/>
+		
+	<!-- Incidents Service -->
+    <cxf:cxfEndpoint id="incident-ws" 
+		address="http://localhost:28080/esb/incident" wsdlURL="contracts/incidents-service.wsdl"
+		endpointName="s:incidentPort" serviceName="s:incidentService"		
+		xmlns:s="http://aerolineas-latinoamericana.com/soa/processes/incidents-message/process-incidents-message/"/>
+		
+	<cxf:cxfEndpoint id="mop-request-ws" 
+		address="http://localhost:28080/esb/mop" wsdlURL="contracts/mop-service.wsdl"
+		endpointName="s:mopSOAP" serviceName="s:mop"
+		xmlns:s="http://aerolineas-latinoamericana.com/soa/mop-message/mop-rule/"/>	
+</beans>

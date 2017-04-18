@@ -1,0 +1,143 @@
+package co.com.foundation.mtx.reporting.model;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
+import javax.persistence.Basic;
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+@Entity
+@Table(name = "OPERATOR")
+@Cacheable(true)
+@NamedQueries({
+    @NamedQuery(name = "Operator.findAll", query = "SELECT o FROM Operator o")
+    , @NamedQuery(name = "Operator.findById", query = "SELECT o FROM Operator o WHERE o.id = :id")
+    , @NamedQuery(name = "Operator.findByFirstName", query = "SELECT o FROM Operator o WHERE o.firstName = :firstName")
+    , @NamedQuery(name = "Operator.findByLastName", query = "SELECT o FROM Operator o WHERE o.lastName = :lastName")
+    , @NamedQuery(name = "Operator.findBySpeciality", query = "SELECT o FROM Operator o WHERE o.speciality = :speciality")
+    , @NamedQuery(name = "Operator.findByCharge", query = "SELECT o FROM Operator o WHERE o.charge = :charge")})
+public class Operator implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    
+    @Id
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "ID")
+    private BigDecimal id;
+    
+    @Size(max = 60)
+    @Column(name = "FIRST_NAME")
+    private String firstName;
+    
+    @Size(max = 60)
+    @Column(name = "LAST_NAME")
+    private String lastName;
+    
+    @Size(max = 50)
+    @Column(name = "SPECIALITY")
+    private String speciality;
+    
+    @Column(name = "CHARGE")
+    private BigInteger charge;
+    
+    //@ManyToMany(mappedBy = "operatorList")
+    //private List<MaintenanceExecution> maintenanceExecutionList;
+
+    public Operator() {
+    }
+
+    public String getFullName(){
+    	//return firstName+" "+lastName;
+    	return new StringBuilder(firstName).append(" ").append(lastName).toString();
+    }
+    
+    public Operator(BigDecimal id) {
+        this.id = id;
+    }
+
+    public BigDecimal getId() {
+        return id;
+    }
+
+    public void setId(BigDecimal id) {
+        this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getSpeciality() {
+        return speciality;
+    }
+
+    public void setSpeciality(String speciality) {
+        this.speciality = speciality;
+    }
+
+    public BigInteger getCharge() {
+        return charge;
+    }
+
+    public void setCharge(BigInteger charge) {
+        this.charge = charge;
+    }
+
+    public List<MaintenanceExecution> getMaintenanceExecutionList() {
+        return maintenanceExecutionList;
+    }
+
+    public void setMaintenanceExecutionList(List<MaintenanceExecution> maintenanceExecutionList) {
+        this.maintenanceExecutionList = maintenanceExecutionList;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof Operator)) {
+            return false;
+        }
+        Operator other = (Operator) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+    
+    /*
+	@Override
+	public String toString() {
+		return "Operator [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", speciality="
+				+ speciality + ", charge=" + charge + ", maintenanceExecutionList=" + maintenanceExecutionList + "]";
+	} */   
+}

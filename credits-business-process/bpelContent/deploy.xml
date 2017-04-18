@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03"
+	xmlns:brms="http://javeriana-credits/brms" xmlns:es="http://javeriana-credits/enterprise-services"
+	xmlns:sample="http://javeriana-credits/bpel-engine/services">
+	<process name="sample:credits-business-process">
+		<active>true</active>
+		<retired>false</retired>
+		<process-events generate="all" />
+
+		<provide partnerLink="client">
+			<service name="sample:credits-business-process" port="credits-business-processPort" />
+		</provide>
+
+		<invoke partnerLink="businessRuleServicePartnerLink">
+			<service name="brms:businessRuleService" port="businessRulePort" />
+		</invoke>
+
+		<invoke partnerLink="creditsEnterpriseServicePartnerLink">
+			<service name="es:creditsEnterpriseService" port="creditsEnterprisePort" />
+		</invoke>
+
+	</process>
+</deploy>

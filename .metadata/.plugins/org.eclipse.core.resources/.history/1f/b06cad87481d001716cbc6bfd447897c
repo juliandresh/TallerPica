@@ -1,0 +1,48 @@
+package co.com.foundation.mtx.filter.throttle;
+
+import co.com.foundation.mtx.filter.model.FilterCriteriaDTO;
+import co.com.foundation.mtx.filter.operations.info.AircraftInformation;
+import co.com.foundation.mtx.filter.operations.info.DataSet;
+
+public class WorkItem {
+
+	private Object xmlContent;
+	private boolean result;
+	private FilterCriteriaDTO criteriaDTO;
+	private DataSet xmlContent1;
+
+	public boolean isResult() {
+		return result;
+	}
+
+	public void setResult(boolean result) {
+		this.result = result;
+	}
+
+	public Object getXmlContent() {
+		return xmlContent;
+	}
+
+	public void setXmlContent(Object xmlContent) {
+		this.xmlContent = xmlContent;
+	}
+
+	public FilterCriteriaDTO getCriteriaDTO() {
+		return criteriaDTO;
+	}
+
+	public void setCriteriaDTO(FilterCriteriaDTO criteriaDTO) {
+		this.criteriaDTO = criteriaDTO;
+	}
+
+	public AircraftInformation getXmlContent1() {
+		return xmlContent1;
+	}
+
+	public void setXmlContent1(AircraftInformation xmlContent1) {
+		this.xmlContent1 = xmlContent1;
+	}
+	
+	
+
+}

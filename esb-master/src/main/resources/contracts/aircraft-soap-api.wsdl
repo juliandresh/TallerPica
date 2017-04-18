@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:tns="http://aerolineas-latinoamericana.com/soa/processes/aircraft-artifacts"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  name="aircraft-soap-api"
+                  targetNamespace="http://aerolineas-latinoamericana.com/soa/processes/aircraft-artifacts">
+
+    <wsdl:types>
+        <xsd:schema
+            targetNamespace="http://aerolineas-latinoamericana.com/soa/processes/aircraft-artifacts">
+
+            <xsd:complexType name="IncidentsReport">
+                <xsd:sequence>
+                    <xsd:element name="description" type="xsd:string" />
+                    <xsd:element name="summary" type="xsd:string" />
+                    <xsd:element name="category" type="xsd:integer" />
+                </xsd:sequence>
+            </xsd:complexType>
+			
+            <xsd:complexType name="Maintenance">
+                <xsd:sequence>
+                    <xsd:element name="fuelPercentage" type="xsd:integer" />
+                    <xsd:element name="undercarriageStatus" type="xsd:string" />
+                </xsd:sequence>
+            </xsd:complexType>
+			
+            <xsd:complexType name="CrewPlaningChanges">
+                <xsd:sequence>
+                    <xsd:element name="applyChangesOnCrewMembers" type="xsd:boolean" />
+                    <xsd:element name="totalCrewMemberRequired" type="xsd:integer" />
+                    <xsd:element name="changePilot" type="xsd:boolean" />
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:element name="process">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element ref="tns:aircraftIngateEvent" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="processResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="transactionCode" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+                        
+            <xsd:element name="aircraftIngateEvent">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="eventDate" type="xsd:date" />
+                        <xsd:element name="incidentsReport" type="tns:IncidentsReport"/>
+                        <xsd:element name="maintenance" type="tns:Maintenance"/>
+                        <xsd:element name="crewPlaningChanges" type="tns:CrewPlaningChanges"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+        </xsd:schema>
+    </wsdl:types>
+
+    <wsdl:message name="processRequest">
+        <wsdl:part element="tns:process" name="parameters" />
+    </wsdl:message>
+    <wsdl:message name="processResponse">
+        <wsdl:part element="tns:processResponse" name="parameters" />
+    </wsdl:message>
+
+    <wsdl:portType name="aircraft-soap-api-port-type">
+        <wsdl:operation name="process">
+            <wsdl:input message="tns:processRequest" />
+            <wsdl:output message="tns:processResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="aircraft-soap-apiSOAP" type="tns:aircraft-soap-api-port-type">
+        <soap:binding style="document"
+                              transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="process">
+            <soap:operation
+                soapAction="http://aerolineas-latinoamericana.com/soa/processes/aircraft-artifacts/process" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="aircraft-soap-api-service">
+        <wsdl:port binding="tns:aircraft-soap-apiSOAP" name="aircraft-soap-api-service-port">
+            <soap:address location="http://www.example2.org/" />
+        </wsdl:port>
+    </wsdl:service>
+
+</wsdl:definitions>

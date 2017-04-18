@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mop="http://aerolineas-latinoamericana.com/soa/mop-message/mop-rule/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <mop:mopEventResponse>
+         <response>OK</response>
+      </mop:mopEventResponse>
+   </soapenv:Body>
+</soapenv:Envelope>

@@ -1,0 +1,57 @@
+package co.com.foundation.mtx.filter.unmarshaller.impl;
+
+import java.io.File;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+
+import co.com.foundation.mtx.filter.operations.info.DataSet;
+import co.com.foundation.mtx.filter.unmarshaller.Unmarshaller;
+
+
+public class JAXBUnmarshaller implements Unmarshaller<File, DataSet>
+{
+	private static Map<DataSet.class, JAXBContext> contextStore = new ConcurrentHashMap<DataSet.class, JAXBContext>();
+	 
+	static final JAXBContext context = getJAXBInstance();
+
+    private final static JAXBContext initContext(Class<DataSet> classObject) {
+        try 
+        {
+			return JAXBContext.newInstance(classObject);
+		} 
+        catch (JAXBException e) 
+        {
+			return null;
+		}
+    }
+    
+	public static JAXBContext getJAXBInstance(Class<DataSet> classObject)
+	{
+		JAXBContext jaxbContext = getJAXBInstance()
+		if(jaxbContext == null)
+		{
+			try 
+			{
+				jaxbContext = initContext(DataSet.class);
+			} 
+			catch (JAXBException e) 
+			{			
+				e.printStackTrace();
+			}
+		}
+		return jaxbContext;
+	}
+	
+	@Override
+	public DataSet unmarshall(File file) {
+		try {
+			JAXBContext jaxbContext = JAXBContext.newInstance(DataSet.class);
+			javax.xml.bind.Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+			return (DataSet) jaxbUnmarshaller.unmarshal(file);
+		} 
+		catch (JAXBException e) {
+			return null;
+		}		
+	}
+}

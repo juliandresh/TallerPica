@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="mtx-filter-service-old">
+        <property name="context-root" value="mtx-filter-service-old"/>
+        <property name="java-output-path" value="/mtx-filter-service-old/target/classes"/>
+    </wb-module>
+</project-modules>

@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1491015761930
+Build-Jdk: 1.8.0_60
+Built-By: LENOVO
+Bundle-ManifestVersion: 2
+Bundle-Name: [brms-integration-services]
+Bundle-SymbolicName: brms-integration-services
+Bundle-Version: 1.0.0.SNAPSHOT
+Created-By: Apache Maven Bundle Plugin
+Export-Package: co.com.foundation.javeriana.model;uses:="javax.xml.bind.
+ annotation";version="1.0.0.SNAPSHOT",co.com.foundation.javeriana.proces
+ sor;uses:="org.apache.http.client,org.apache.camel,org.apache.http.enti
+ ty,org.apache.http.client.methods,org.apache.http,org.apache.http.impl.
+ client";version="1.0.0.SNAPSHOT"
+Import-Package: javax.xml.bind.annotation,org.apache.activemq,org.apache
+ .activemq.camel.component,org.apache.activemq.pool,org.apache.camel;ver
+ sion="[2.17,3)",org.apache.camel.component.jms,org.apache.http,org.apac
+ he.http.client,org.apache.http.client.methods,org.apache.http.entity,or
+ g.apache.http.impl.client
+Tool: Bnd-1.50.0

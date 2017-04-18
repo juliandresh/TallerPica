@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xmlns:cxf="http://camel.apache.org/schema/cxf"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <import resource="infrastructure.xml"/>
+    
+    <!--bean id="crewAdapter" class="co.edu.javeriana.aes.modval.aircraft.esb.flows.CrewAdapter"/-->
+    
+    
+	
+    <camel:camelContext xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:proc="http://aerolineas-latinoamericana.com/soa/processes/crew-message/process-crew-message/">
+		
+        
+        <camel:dataFormats>
+            <camel:jaxb id="jaxb_xml" contextPath="co.edu.javeriana.aes.pica.crew.model"/>
+            <camel:json id="json" library="XStream"/>
+        </camel:dataFormats>
+        
+        <camel:route id="brms-soap" streamCache="true">
+			
+            <camel:from uri="cxf:bean:businessRule?dataFormat=MESSAGE" />
+            <camel:log message="Business---------[log] - ${body}"/>
+			
+        </camel:route>
+        
+        <camel:route>
+            <camel:from uri="cxf:bean:aircraft-ws?dataFormat=MESSAGE"/>
+            <camel:log message="Aircraft-----------[log] - Message Received ${body}"/>
+        </camel:route>
+        
+        <camel:route id="crew-ws">
+            <camel:from uri="cxf:bean:crew-ws?dataFormat=MESSAGE"/>
+            <camel:split>
+                <camel:xpath>/soapenv:Envelope/soapenv:Body/proc:changeCrew</camel:xpath>
+                <camel:to uri="xslt:transformations/message-crew-in.xsl"/>
+                <camel:wireTap uri="activemq:topic:CREW.TEMP.QUEUE"/>
+            </camel:split>
+            <camel:to uri="language:constant:resource:classpath:/responses/crew-response.xml"/>
+        </camel:route>
+        <camel:route id="json_transformer_crew">
+            <camel:from uri="activemq:topic:CREW.TEMP.QUEUE"/>
+            <camel:unmarshal ref="jaxb_xml"/>
+            <camel:marshal ref="json"/>
+            <camel:log message="Json Transformer-[log] - Message Received ${body}"/>
+            <camel:to uri="activemq:queue:CREW.JSON.QUEUE"/>
+        </camel:route>
+    </camel:camelContext>
+</beans>

@@ -1,0 +1,105 @@
+package co.com.foundation.mtx.reporting.business;
+
+import java.util.List;
+import java.util.Optional;
+
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import co.com.foundation.mtx.reporting.model.MaintenanceExecution;
+import co.com.foundation.mtx.reporting.model.Operator;
+import co.com.foundation.mtx.reporting.model.ReportDTO;
+
+@Stateless
+@TransactionManagement(TransactionManagementType.CONTAINER)
+public class ReportApi {
+	@PersistenceContext(unitName = "reporting-pu")
+	private EntityManager entityManager;
+
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+	public ReportDTO generate() {
+
+		ReportDTO reportDTO = new ReportDTO();
+		String query = "select me from MaintenanceExecution me";
+		//Obtiene información de la tabla clase MaintenanceExecution
+		List<MaintenanceExecution> list = entityManager.createQuery(query, MaintenanceExecution.class).getResultList();		
+		/*for (MaintenanceExecution maintenanceExecution : list) {
+			evaluateOperators(reportDTO, maintenanceExecution.getOperatorList());
+			reportDTO.addMaintenanceCount();
+			System.out.println("TOTAL MAINTENANCE:" + reportDTO.getTotalCost());
+			System.out.println("----------------------------------------------------------------");
+		}*/
+		list.forEach((me) -> {
+
+			//System.out.println("Processing MaintenanceExecution " + me + " with total notes: " + me.getOperatorList().size());
+			//ENVIA A EVALUACION EL LISTADO DE USUARIOS
+			evaluateOperators(reportDTO, me.getOperatorList());
+			//evaluateCost(reportDTO, me.getOperatorList());			
+			reportDTO.addMaintenanceCount();
+			System.out.println("TOTAL MAINTENANCE:" + reportDTO.getTotalCost());
+			System.out.println("----------------------------------------------------------------");
+		});		
+		return reportDTO;
+	}
+	
+	// --------------------------
+		private void evaluateOperators1(ReportDTO reportDTO, List<Operator> operators) {
+			for (Operator MOperator : operators) {
+				String query = "select op from Operator op where op.id = :ID";
+				Operator operator = entityManager.createQuery(query, Operator.class)
+						.setParameter("ID", MOperator.getId())
+						.getSingleResult();				
+				if( !reportDTO.getOperators().contains( operator.getFullName() ) ){
+					reportDTO.getOperators().add( operator.getFullName() );					
+				//	System.out.println(operator.getFullName());					
+				}
+				reportDTO.addCost(operator.getCharge());
+			}						
+		}
+	
+	// --------------------------
+	private void evaluateOperators(ReportDTO reportDTO, List<Operator> operators) {
+		operators.stream().forEach((o) -> {		
+			Optional<Operator> optional = Optional.ofNullable(o);
+			//Si el objeto no es nulo
+			if (optional.isPresent()) {
+				String query = "select op from Operator op where op.id = :ID";
+				//Operator operator = entityManager.createQuery(query, Operator.class)
+				//		.setParameter("ID", o.getId())
+				//		.getSingleResult();
+				List<Operator> resultOperator = entityManager.createQuery(query, Operator.class)
+						.setParameter("ID", o.getId())
+						.getResultList();
+				Operator operator = resultOperator.isEmpty() ? null : resultOperator.get(0);
+				
+				//System.out.println( "Processing operator: " + operator );
+				//System.err.println(operator.getFullName());
+				if( !reportDTO.getOperators().contains( operator.getFullName() ) ){
+					reportDTO.getOperators().add( operator.getFullName() );					
+				//	System.out.println(operator.getFullName());					
+				}
+				reportDTO.addCost(operator.getCharge());
+			}
+		});
+	}
+/*
+	private void evaluateCost(final ReportDTO reportDTO, List<Operator> operators) {
+		operators.stream().forEach((o) -> {
+			Optional<Operator> optional = Optional.ofNullable(o);
+			//Si el objeto no es nulo
+			if (optional.isPresent()) {
+				String query = "select op from Operator op where op.id = :ID";
+				Operator operator = entityManager.createQuery(query, Operator.class)
+						.setParameter("ID", o.getId())
+						.getSingleResult();			
+				reportDTO.addCost(operator.getCharge() );
+			}
+		});		
+	}
+*/	
+}

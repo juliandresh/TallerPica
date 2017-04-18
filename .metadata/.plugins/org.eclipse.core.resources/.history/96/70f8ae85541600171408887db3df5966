@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:camel="http://camel.apache.org/schema/spring"
+	 xmlns:cxf="http://camel.apache.org/schema/cxf"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<import resource="infrastructure.xml"/>
+
+	<bean id="remoteRuleAdapter" class="co.com.foundation.javeriana.processor.RemoteRuleAdapter"/>
+	<bean id="bpelAdapter" class="co.com.foundation.javeriana.processor.BpelAdapter"/>
+		
+	<camel:camelContext xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+	xmlns:air="http://aerolineas-latinoamericana.com/soa/processes/aircraft-artifacts" 
+	xmlns:proc="http://aerolineas-latinoamericana.com/soa/processes/crew-message/process-crew-message/"
+	xmlns:mop="http://aerolineas-latinoamericana.com/soa/mop-message/mop-rule/"
+	xmlns:inc="http://aerolineas-latinoamericana.com/soa/processes/incidents-message/process-incidents-message/">
+	
+		<camel:dataFormats>
+            <camel:jaxb id="jaxb_xml" contextPath="co.com.foundation.javeriana.model"/>
+            <camel:json id="json" library="XStream"/>
+        </camel:dataFormats>
+        
+        <!-- CONTRATO AIRCRAFT.SOAP.API -->
+        <camel:route id="aircraft-ws" streamCache="true">
+        	<camel:from uri="cxf:bean:aircraft-ws?dataFormat=MESSAGE"/>
+        	<camel:log message="AIRCRAFT MESSAGE-[log] - LLEGADA DE MENSAJE ${body}"/>
+        	 <camel:split>
+                <camel:xpath>/soapenv:Envelope/soapenv:Body/air:process/air:aircraftIngateEvent</camel:xpath>
+                <camel:log message="AIRCRAFT MESSAGE-[log] - PASO XPATH"/>
+                <camel:to uri="xslt:transformations/aircraft-to-bpel-transformer.xsl"/>
+                <camel:log message="AIRCRAFT MESSAGE-[log] - PASO TRANSFORMACION"/>                
+            	<camel:log message="AIRCRAFT MESSAGE-[log] - INICIA EL PROCESO"/>   
+            	<camel:to uri="bean:bpelAdapter?method=process"/>
+            	<camel:log message="AIRCRAFT FIN - ${body}"/>            	
+             </camel:split>
+             <camel:split>
+            		<camel:xpath>/soapenv:Envelope/soapenv:Body/swift-business-processResponse</camel:xpath>
+            		<camel:inOut uri="xslt:transformations/aircraft-response.xsl"/>
+             </camel:split>          	             
+        </camel:route>
+        
+        <!-- ESPERA LA INVOCACION DESDE BPEL A LA REGLA DE NEGOCIO -->
+		<camel:route id="brms-soap" streamCache="true">
+			<camel:from uri="cxf:bean:brmsWS?dataFormat=MESSAGE" />
+			<camel:log message="Brms Service ---------[log] - ${body}"/>
+			<camel:to uri="xslt:transformations/brms-in-transformer.xsl"/>
+			<camel:to uri="bean:remoteRuleAdapter?method=process"/>
+			<camel:to uri="xslt:transformations/brms-out-transformer.xsl"/>			
+		</camel:route>	
+		
+		<camel:route id="mop-request-ws" streamCache="true">
+            <camel:from uri="cxf:bean:mop-request-ws?dataFormat=MESSAGE"/>
+            <camel:log message="MOP MESSAGE-[log] - LLEGADA DE MENSAJE ${body}"/>
+            <camel:split>
+                <camel:xpath>/soapenv:Envelope/soapenv:Body/mop:mopEvent</camel:xpath>
+                <camel:log message="MOP MESSAGE-[log] - PASO POR XPATH ${body}"/>
+                <camel:to uri="xslt:transformations/mop-transformer.xsl"/>
+                <camel:log message="MOP WS SERVICE-[log] - YA PASO POR TRANSFORMACION ${body}"/>
+            	<camel:wireTap uri="activemq:queue:MOP.REQUEST.QUEUE"/>
+            	<camel:log message="MOP WS SERVICE-[log] - YA COPIO EN COLA"/>
+            </camel:split>
+            <camel:to uri="language:constant:resource:classpath:/static_content/mop-response.xml"/>
+        </camel:route>	
+		
+		<!-- ESPERA LA INVOCACION DESDE BPEL AL WS CREW-->
+		<camel:route id="crew-ws" streamCache="true">
+            <camel:from uri="cxf:bean:crew-ws?dataFormat=MESSAGE"/>
+            <camel:log message="CREW WS ENVELOPE BODY----------------[log] - BODY: ${body}"/>		
+			<camel:split>
+				    <camel:xpath>/soapenv:Envelope/soapenv:Body/proc:changeCrew</camel:xpath>
+					<camel:log message="CREW WS ENVELOPE-----------[log] - YA PASO POR XPATH"/>
+                	<camel:to uri="xslt:transformations/message-crew-in.xsl"/>
+                	<camel:log message="CREW WS ENVELOPE-----------[log] - YA PASO POR TRANSFORMACION"/>
+                	<camel:wireTap uri="activemq:queue:CREW.REQUEST.QUEUE"/>
+            </camel:split>
+			<camel:log message="CREW WS RESPUESTA ESTATICA-----------[log] - ENVIA RESPUESTA ESTATICA"/>
+            <camel:to uri="language:constant:resource:classpath:/static_content/crew-response.xml"/>
+        </camel:route>
+                  
+        <camel:route id="json_transformer_crew">
+            <camel:from uri="activemq:queue:CREW.REQUEST.QUEUE"/>
+            <camel:unmarshal ref="jaxb_xml"/>
+            <camel:marshal ref="json"/>
+            <camel:log message="Json Transformer-[log] - Message Received ${body}"/>
+            <camel:to uri="activemq:queue:CREW.RESPONSE.JSON.QUEUE"/>
+        </camel:route>
+        
+        
+        <!-- ESPERA LA INVOCACION DESDE BPEL AL WS INCIDENTES-->      
+        <camel:route id="incident-ws" streamCache="true">
+            <camel:from uri="cxf:bean:incident-ws?dataFormat=MESSAGE"/>
+            <camel:split>
+                <camel:xpath>/soapenv:Envelope/soapenv:Body/inc:reportIncident</camel:xpath>
+                <camel:log message="INCIDENT WEB SERVICE-----------[log] - YA PASO POR XPATH"/>
+                <camel:to uri="xslt:transformations/message-incident-in.xsl"/>
+                <camel:log message="INCIDENT WEB SERVICE-----------[log] - PRIMERA TRANSFORMACION"/>
+                <camel:to uri="xslt:transformations/message-incident-csv-transformer.xsl"/>
+                <camel:log message="INCIDENT WEB SERVICE-----------[log] - SEGUNDA TRANSFORMACION"/>
+                <camel:log message="FixedLength Transformer-[log] - Message Received ${body}"/>
+                <camel:wireTap uri="file:C://AES-WS/swift/?fileName=incident-${date:now:yyyyMMdd_hhmmss}.txt" />
+            </camel:split>
+            <camel:log message="INCIDENT RESPUESTA ESTATICA...-----------[log] - Enviando..."/>
+            <camel:to uri="language:constant:resource:classpath:/static_content/incident-response.xml"/>
+            <camel:log message="INCIDENT WEB SERVICE FIN-----------[log] - ESTATICA OK"/>
+        </camel:route>
+
+	</camel:camelContext>
+</beans>

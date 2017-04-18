@@ -1,0 +1,57 @@
+package co.com.foundation.mtx.filter.mediator.imp;
+
+import java.io.File;
+import java.util.Queue;
+import java.util.concurrent.DelayQueue;
+
+import javax.xml.bind.JAXBContext;
+
+import co.com.foundation.mtx.filter.mediator.Mediator;
+import co.com.foundation.mtx.filter.model.FilterCriteriaDTO;
+import co.com.foundation.mtx.filter.operations.info.AircraftInformation;
+import co.com.foundation.mtx.filter.operations.info.DataSet;
+import co.com.foundation.mtx.filter.throttle.PostponedWorkItem;
+import co.com.foundation.mtx.filter.throttle.WorkItem;
+import co.com.foundation.mtx.filter.unmarshaller.Unmarshaller;
+import co.com.foundation.mtx.filter.unmarshaller.impl.JAXBUnmarshaller;
+
+public class ThrottleMediator implements Mediator<FilterCriteriaDTO, Boolean> {
+
+	private static ThrottleMediator INSTANCE;
+	
+	//private Unmarshaller<String,Document> unmarshaller = DOMUnmarshaller.newInstance();
+	private JAXBContext jaxbContext = JAXBUnmarshaller.getJAXBInstance(AircraftInformation.class);
+	
+	// -------------------------
+	private long delay = 4000;
+	private final Queue<PostponedWorkItem> delayedQueue = new DelayQueue<PostponedWorkItem>();
+
+	private ThrottleMediator() {
+	}
+
+	public static ThrottleMediator getInstance() {
+		if (INSTANCE == null)
+			INSTANCE = new ThrottleMediator();
+		return INSTANCE;
+	}
+
+	public Boolean process(final FilterCriteriaDTO input){
+		
+		boolean result = true;
+		Unmarshaller jaxbUnmarshaller = (Unmarshaller) unmarshaller.createUnmarshaller();
+		jaxbUnmarshaller.unmarshall(DataSet.class, new File("C://data/aircraft-operations-info.xml"))
+		//DataSet dataSet= unmarshaller.unmarshall(DataSet.class, new File("C://data/aircraft-operations-info.xml"));
+		System.out.println("IMPRIMIR EL DATASET...");
+		System.out.println(dataSet);
+		WorkItem item = new WorkItem();
+		item.setCriteriaDTO(input);
+		item.setResult(result);
+		item.setXmlContent1(dataSet);
+		//setXmlContent(document);
+		PostponedWorkItem postponedWorkItem = new PostponedWorkItem(item, delay);
+		delayedQueue.add(postponedWorkItem);
+		
+		return result;
+	}
+
+}

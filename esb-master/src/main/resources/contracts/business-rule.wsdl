@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://www.busines-rule.com/business-rule/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="business_rule"
+	targetNamespace="http://www.busines-rule.com/business-rule/">
+	
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://www.busines-rule.com/business-rule/">
+			
+			<xsd:element name="ruleRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="tns:validateMaintenance" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			
+			<xsd:element name="ruleResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="tns:validateMaintenance" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			
+			<xsd:element name="validateMaintenance">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="estado_tren_aterrizaje" type="xsd:string" />
+						<xsd:element name="porcentaje_combustible" type="xsd:integer" />
+						<xsd:element name="skipMaintenance" type="xsd:boolean" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>			
+			
+		</xsd:schema>
+	</wsdl:types>
+	
+	<wsdl:message name="ruleRequestMessage">
+		<wsdl:part element="tns:ruleRequest" name="parameters" />
+	</wsdl:message>
+	
+	<wsdl:message name="ruleResponseMessage">
+		<wsdl:part element="tns:ruleResponse" name="parameters" />
+	</wsdl:message>
+	
+	<wsdl:portType name="businessRulePortType">
+		<wsdl:operation name="evaluateRule">
+			<wsdl:input message="tns:ruleRequestMessage" />
+			<wsdl:output message="tns:ruleResponseMessage" />
+		</wsdl:operation>
+	</wsdl:portType>
+	
+	<wsdl:binding name="business_ruleSOAP" type="tns:businessRulePortType">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="evaluateRule">
+			<soap:operation
+				soapAction="http://www.busines-rule.com/business-rule/brmsevaluateRule" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	
+	<wsdl:service name="businessRuleService">
+		<wsdl:port binding="tns:business_ruleSOAP" name="businessRulePort">
+			<soap:address location="http://www.example.org/" />
+		</wsdl:port>
+	</wsdl:service>
+	
+</wsdl:definitions>

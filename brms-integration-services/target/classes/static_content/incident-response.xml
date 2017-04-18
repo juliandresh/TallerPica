@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+xmlns:inc="http://aerolineas-latinoamericana.com/soa/processes/incidents-message/process-incidents-message/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <inc:reportIncidentResponse>
+          <result>OK</result>
+      </inc:reportIncidentResponse>
+   </soapenv:Body>
+</soapenv:Envelope>

@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<definitions name="maintenance-business-process"
+        targetNamespace="http://javeriana-maintenance/bpel-engine/services"
+        xmlns:tns="http://javeriana-maintenance/bpel-engine/services"
+        xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
+        xmlns="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+        >
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     TYPE DEFINITION - List of services participating in this BPEL process 
+     The default output of the BPEL designer uses strings as input and 
+     output to the BPEL Process. But you can define or import any XML 
+     Schema type and us them as part of the message types.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->    
+    <types>  
+        <schema attributeFormDefault="unqualified" 
+                elementFormDefault="qualified" 
+                targetNamespace="http://javeriana-maintenance/bpel-engine/services" 
+                xmlns="http://www.w3.org/2001/XMLSchema"
+                >
+                
+            <element name="maintenance-business-processRequest">
+                <complexType>
+                    <sequence>
+                        <element name="status" type="string" />
+						<element name="fuelPercentage" type="integer" />
+						
+						<element name="description" type="string" />
+						<element name="summary" type="string" />
+						<element name="category" type="integer" />
+						
+						<element name="applyChangesOnCrewMembers" type="boolean" />
+						<element name="totalCrewMemberRequired" type="integer" />
+						<element name="changePilot" type="boolean" />
+                    </sequence>
+                </complexType>
+            </element>
+                  
+            <element name="maintenance-business-processResponse">
+                <complexType>
+                    <sequence>
+                        <element name="skipMaintenance" type="boolean" />
+                        <element name="result" type="string"></element>
+                    </sequence>
+                </complexType>
+            </element>
+            
+        </schema>
+    </types>
+  
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     MESSAGE TYPE DEFINITION - Definition of the message types used as 
+     part of the port type defintions
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->    
+    <message name="maintenance-business-processRequestMessage">
+        <part name="payload" element="tns:maintenance-business-processRequest"/>
+    </message>
+    
+    <message name="maintenance-business-processResponseMessage">
+        <part name="payload" element="tns:maintenance-business-processResponse"/>
+    </message>
+
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     PORT TYPE DEFINITION - A port type groups a set of operations into
+     a logical service unit.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- portType implemented by the maintenance-business-process BPEL process -->
+    <portType name="maintenance-business-process">
+        <operation name="process">
+            <input message="tns:maintenance-business-processRequestMessage"/>
+            <output message="tns:maintenance-business-processResponseMessage" />
+        </operation>
+    </portType>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     PARTNER LINK TYPE DEFINITION
+         the maintenance-business-process partnerLinkType binds the provider and
+         requester portType into an asynchronous conversation.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->    
+    <plnk:partnerLinkType name="maintenance-business-process">
+        <plnk:role name="maintenance-business-processProvider" portType="tns:maintenance-business-process"/>
+    </plnk:partnerLinkType>   
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     BINDING DEFINITION - Defines the message format and protocol details
+     for a web service.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <binding name="maintenance-business-processBinding" type="tns:maintenance-business-process">
+        <soap:binding style="document"
+    		transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="process">
+            <soap:operation
+    			soapAction="http://javeriana-maintenance/bpel-engine/services/process"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+				<soap:body use="literal" />
+			</output>
+        </operation>
+    </binding>
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     SERVICE DEFINITION - A service groups a set of ports into
+     a service unit.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <service name="maintenance-business-process">
+        <port name="maintenance-business-processPort" binding="tns:maintenance-business-processBinding">
+    		<soap:address location="http://localhost:8080/maintenance-business-process"/>
+        </port>
+    </service>
+</definitions>

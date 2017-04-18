@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
+xmlns:proc="http://aerolineas-latinoamericana.com/soa/processes/crew-message/process-crew-message/" 
+xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+name="CrewService" 
+targetNamespace="http://aerolineas-latinoamericana.com/soa/processes/crew-message/process-crew-message/">
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://aerolineas-latinoamericana.com/soa/processes/crew-message/process-crew-message/">
+            <xsd:element name="changeCrew">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="applyChangesOnCrewMembers"
+                                     type="xsd:boolean" />
+                        <xsd:element name="totalCrewMemberRequired"
+                                     type="xsd:int">
+                        </xsd:element>
+                        <xsd:element name="changePilot" type="xsd:string"></xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="changeCrewResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="result" type="xsd:string"></xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="changeCrewRequest">
+        <wsdl:part element="proc:changeCrew" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="changeCrewResponse">
+        <wsdl:part element="proc:changeCrewResponse" name="parameters"/>
+    </wsdl:message>
+    
+    <plnk:partnerLinkType name="crewPortType_PLT">
+		<plnk:role name="CrewPortType_Role" portType="proc:CrewPortType" />
+	</plnk:partnerLinkType>
+    
+    <wsdl:portType name="CrewPortType">
+        <wsdl:operation name="changeCrew">
+            <wsdl:input message="proc:changeCrewRequest"/>
+            <wsdl:output message="proc:changeCrewResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:binding name="CrewBinding" type="proc:CrewPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="changeCrew">
+            <soap:operation soapAction="http://aerolineas-latinoamericana.com/soa/processes/crew-message/process-crew-message/changeCrew"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    
+    <wsdl:service name="CrewService">
+        <wsdl:port binding="proc:CrewBinding" name="CrewPortType">
+            <soap:address location="http://localhost:28080/esb/crew"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

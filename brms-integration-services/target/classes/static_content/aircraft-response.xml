@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+xmlns:air="http://aerolineas-latinoamericana.com/soa/processes/aircraft-artifacts">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <processResponse xmlns="http://swift.business.process">  
+			<transactionCode>PROCESS OK</transactionCode>
+		</processResponse>
+   </soapenv:Body>
+</soapenv:Envelope>
